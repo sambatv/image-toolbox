@@ -1,0 +1,20 @@
+# direnv files
+.envrc
+
+# dotenv files
+.env
+
+# backup files
+*.bak
+*.orig
+*~
+
+# temporary files
+tmp/
+*.tmp
+
+# common IDE project files
+.project
+.idea/
+*.tmproj
+.vscode/

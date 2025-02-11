@@ -1,0 +1,28 @@
+# asdf files
+.tool-versions
+
+# backup files
+*.swp
+*.bak
+*.orig
+*~
+
+# direnv files
+.envrc
+
+# dotenv files
+.env
+
+# git repo files
+.git/
+
+# make files
+Makefile
+
+# markdown files
+*.md
+
+# temporary files
+tmp/
+*.tmp
+*.temp
