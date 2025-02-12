@@ -1,7 +1,7 @@
 # Image Toolbox
 
-This repository contains source code for an OCI image that contains tools used
-when building, scanning, signing, and pushing images to OCI repositories.
+This repository contains source code for an OCI image that contains tools
+useful for building, scanning, signing, and publishing OCI images.
 
 ## Application image delivery pipeline
 
@@ -16,10 +16,6 @@ The tasks in an application image delivery pipeline may include:
 It is assumed that building, testing, and scanning application source code
 tasks were performed successfully in an earlier pipeline step.
 
-Additional artifacts, such as Helm charts, may also be stored in the ECR
-repository, but are not part of an image delivery pipeline, and may be
-performed in a later pipeline step if image delivery is successful.
-
 ## Tools
 
 The tools in this image build upon the official Atlassian Bitbucket Pipelines
@@ -33,36 +29,37 @@ image, and additionally include tools used in an image delivery pipeline step:
 - [imagecheck](https://github.com/sambatv/imagecheck) orchestrates the above tools and
   delivers scan reports and summaries to S3 for later analysis, auditing, and reporting
 
+## Publishing
+
+This image extends the `atlassian/default-image:latest` image and adds latest
+versions of the tools listed above
+
+It is built and published to [ghcr.io/sambatv/image-toolbox](https://ghcr.io/sambatv/image-toolbox)
+on a daily cadence for use as a build pipeline step image, as defined in its
+[imagepublisher.yaml](.github/workflows/imagepublisher.yaml) Github Actions
+workflow, using a datestamp tag, in the format `YYYY-MM-DD`.
+
 ## Usage
 
-The image is intended to be used in a Bitbucket Pipeline step.
+An example of its use in a Bitbucket Pipeline step:
 
 ```yaml
 pipelines:
   default:
   - step:
-      name: Build, scan, sign, and push images to ECR
+      name: Build, scan, sign, and publish images
       image:
         name: ghcr.io/image-toolbox:latest
+        username: $GHCR_USERNAME
+        password: $GHCR_TOKEN
       script:
-      - echo "Building, scanning, signing, and pushing images..."
+      - echo "Building, scanning, signing, and publishing images..."
       # The toolchain available in /usr/local/bin in your PATH
 ```
 
 Typically, it is not good advice to depend on the `latest` tag, as it is mutable.
 However, in our case, it is precisely what we want to use as a user of the image.
 
-## Publishing
-
-This image extends the `atlassian/default-image:latest` image and adds latest
-versions of the tools listed above
-
-It is built and delivered to ECR on a daily cadence for use as the image in
-Bitbucket pipeline steps.
-
-The image tag is the datestamp of the build, in the format `YYYY-MM-DD`.
-Datestamp tags are immutable.
-
-The image is also tagged with the `latest` tag  This `latest` tag is mutable.
-
-Both tags are pushed to their ECR repositories upon successful daily builds.
+Also note that $GHCR_USERNAME and $GHCR_TOKEN here are defined in Bitbucket
+workspace variables, and are used to authenticate to the GitHub Container
+Registry (GHCR), with the $GHCR_TOKEN being a personal access token. 
